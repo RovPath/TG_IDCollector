@@ -5,7 +5,8 @@ from aiogram import Bot, Dispatcher
 
 from dotenv import load_dotenv
 
-from app.handlers import router as router_handlers
+from handlers.commands import router as router_commands
+from handlers.idcollector import router as router_idcollector
 
 
 async def main():
@@ -14,7 +15,7 @@ async def main():
     dp = Dispatcher()
     dp.startup.register(startup)
     dp.shutdown.register(shutdown)
-    dp.include_router(router_handlers)
+    dp.include_routers(router_commands, router_idcollector)
     await dp.start_polling(bot)
 
 
