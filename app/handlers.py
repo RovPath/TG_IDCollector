@@ -18,12 +18,12 @@ async def start_bot(message: Message):
 
 @router.message(Command("myid"))
 async def myid_command(message: Message):
-    # Handle optional fields
-    username = f"@{message.from_user.username}" if message.from_user.username else "❌ Не указан"
-    last_name = message.from_user.last_name if message.from_user.last_name else "❌ Не указана"
+
+    username = f"@{message.from_user.username}" if message.from_user.username else "❌ N/A"
+    last_name = message.from_user.last_name if message.from_user.last_name else "❌ N/A"
 
     text = (
-        "📋 <b>Ваши идентификаторы</b>\n\n"
+        "📋 <b>Ваши идентификаторы</b>\n"
         "┌──────────────────\n"
         f"│ 👤 <b>Ваш личный ID:</b> <code>{message.from_user.id}</code>\n"
         f"│ 👥 <b>Username:</b> {username}\n"
@@ -34,4 +34,36 @@ async def myid_command(message: Message):
         f"│ ✉️ <b>ID сообщения:</b> <code>{message.message_id}</code>\n"
         "└──────────────────"
     )
+    await message.answer(text=text, parse_mode="HTML")
+
+
+@router.message(Command("chatid"))
+async def chatid_command(message: Message):
+    chat = message.chat
+    chat_title = "❌ N/A"  # Значение по умолчанию
+    if chat.type == "private":  # ниже объединяем имя и фамилию, удаляя лишние пробелы
+        chat_title = f"{chat.first_name or ''} {chat.last_name or ''}".strip()
+
+    # fmt: off
+    #проверяем, есть ли у объекта chat атрибут title и проверяем, что title не пустой
+    elif hasattr(chat, "title") and chat.title:
+        chat_title = chat.title
+
+    # проверяем, есть ли у чата атрибут username и проверяем, что username не пустой
+    chat_username = "❌ N/A"  # Значение по умолчанию
+    if hasattr(chat, "username") and chat.username:
+        chat_username = f"@{chat.username}"
+    # fmt: on
+
+    text = (
+        "📋 <b>Полная информация о чате</b>\n"
+        "┌──────────────────\n"
+        f"│ 💬 <b>ID чата:</b> <code>{chat.id}</code>\n"
+        f"│ 🏷 <b>Тип чата:</b> {chat.type}\n"
+        f"│ 📝 <b>Название:</b> {chat_title}\n"
+        f"│ 👤 <b>Username:</b> {chat_username}\n"
+        f"│ ✉️ <b>ID сообщения:</b> <code>{message.message_id}</code>\n"
+        "└──────────────────"
+    )
+
     await message.answer(text=text, parse_mode="HTML")
